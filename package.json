@@ -1,0 +1,11 @@
+{
+  "name": "contacs-app",
+  "version": "1.0.0",
+  "description": "backend nodejs",
+  "main": "app.js",
+  "author": "Maula Izza Azizi <github.com/storyofhis>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node app.js"
+  }
+}
