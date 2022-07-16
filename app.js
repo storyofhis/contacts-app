@@ -1,6 +1,6 @@
 const { string } = require("yargs");
 const yargs = require("yargs");
-const { simpanContact } = require("./contacts");
+const { simpanContact, listContact, detailContact, deleteContact } = require("./contacts");
 
 yargs.command(
     {
@@ -37,8 +37,48 @@ yargs.command(
             console.log(contact);
         }
     }
-); 
+).demandCommand();
 
+// menampilkan data contacts
+yargs.command({
+    command: 'list',
+    describe: 'Menampilkan data contacts',
+    handler() {
+        listContact()
+    }
+})
+
+// menampilkan detail dari sebuah contacts
+yargs.command({
+    command: `detail`,
+    describe: `Menampilkan detail dari sebuah contact berdasarkan nama : `,
+    builder: {
+        name: {
+            describe: `Nama Lengkap`,
+            demandOption: true,
+            type: `string`,
+        }
+    },
+    handler(argv) {
+        detailContact(argv.name)
+    }
+})
+
+// menghapus contact berdasarkan nama
+yargs.command({
+    command: `delete`,
+    describe: `Menghapus Contact berdasarkan Nama`,
+    builder: {
+        name: {
+            describe: `Nama Lengkap`,
+            demandOption: true,
+            type: `string`,
+        }
+    },
+    handler(argv){
+        deleteContact(argv.name);
+    }
+})
 yargs.parse();
 
 // const command = process.argv[2];

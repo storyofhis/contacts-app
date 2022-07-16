@@ -9,6 +9,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "validator": "13.5.2",
     "yargs": "16.2.0"
   }
 }

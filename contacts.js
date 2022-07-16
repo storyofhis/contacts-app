@@ -1,5 +1,6 @@
 // const { rejects } = require('assert');
 const fs = require('fs');
+const validator = require(`validator`);
 // const { resolve } = require('path');
 // const readline = require('readline');
  
@@ -29,12 +30,20 @@ if (!fs.existsSync(dataPath)) {
 //     })
 // }
 
+const loadContact = () => {
+    const fileBuffer = fs.readFileSync('data/contacts.json', 'utf-8');
+    const contacts = JSON.parse(fileBuffer); // string menjadi json
+    
+    return contacts
+}
+
 const simpanContact = (name, email, noHP) => {
     const contact = {
         name, email, noHP
     } 
-    const fileBuffer = fs.readFileSync('data/contacts.json', 'utf-8');
-    const contacts = JSON.parse(fileBuffer); // string menjadi json
+    // const fileBuffer = fs.readFileSync('data/contacts.json', 'utf-8');
+    // const contacts = JSON.parse(fileBuffer); // string menjadi json
+    const contacts = loadContact();
 
     // cek duplikat
     const duplikat = contacts.find((contact) => contact.name === name);
@@ -42,7 +51,23 @@ const simpanContact = (name, email, noHP) => {
         console.log(`${duplikat.name} sudah terdaftar gunakan nama yang lain !!!`);
         return false;
     }
-    contacts.push(contact); 
+    contacts.push(contact);
+    
+    // cek email
+    if (email) {
+        if (!validator.isEmail(email)){
+            console.log(`${email} tidak valid !!!`);
+            return false;
+        }
+    }
+
+    // cek no hp
+    if (noHP) {
+        if (!validator.isMobilePhone(noHP, `id-ID`)) {
+            console.log(`${noHP} tidak valid !!! `);
+            return false;
+        }
+    }
 
     fs.writeFileSync('data/contacts.json', JSON.stringify(contacts));
     console.log("Terimakasih Sudah Mengisi");
@@ -50,4 +75,38 @@ const simpanContact = (name, email, noHP) => {
     
 }
 
-module.exports = {simpanContact};
+const listContact = () => {
+    const contacts = loadContact();
+    console.log(`Daftar Contact : `)
+    contacts.forEach((contact, index) => {
+        console.log(`${index + 1}. ${contact.name} - ${contact.email} - ${contact.noHP}`)
+    });
+}
+
+const detailContact = (name) => {
+    const contacts = loadContact();
+
+    const contact = contacts.find((param) => param.name.toLowerCase() === name.toLowerCase());
+    if (!contact){
+        console.log(`${name} tidak ditemukan !!!`);
+        return false;
+    }
+
+    console.log(`${contact.name}`);
+    console.log(`${contact.noHP}`);
+    contact.email ? console.log(`${contact.email}`) : console.log(`anda tidak mengisi email`);
+}
+
+const deleteContact = (name) => {
+    const contacts = loadContact();
+    
+    const newContacts = contacts.filter((param) => param.name.toLowerCase() !== name.toLowerCase());
+    if (contacts.length === newContacts.length) {
+        console.log(`${name} tidak ditemukan !!!`);
+        return false;
+    }
+
+    fs.writeFileSync(`data/contacts.json`, JSON.stringify(newContacts));
+    console.log(`data dengan contact ${name} berhasil dihapus !!!`);
+}
+module.exports = {simpanContact, listContact, detailContact, deleteContact};
